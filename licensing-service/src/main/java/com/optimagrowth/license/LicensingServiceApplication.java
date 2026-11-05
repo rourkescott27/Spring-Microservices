@@ -16,6 +16,7 @@ public class LicensingServiceApplication {
         SpringApplication.run(LicensingServiceApplication.class, args);
     }
 
+    //Determines which language to use
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver localeResolver = new SessionLocaleResolver();
@@ -23,6 +24,7 @@ public class LicensingServiceApplication {
         return localeResolver;
     }
 
+    //Determines what translated message to return
     @Bean
     public ResourceBundleMessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
