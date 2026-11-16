@@ -4,13 +4,14 @@ spring:
   profiles:
     active:
       - vault
+      - native
 
   cloud:
     config:
       server:
        vault:
          port: 8200
-         host: 127.0.0.1
+         host: host.docker.internal
          kvVersion: 2
 server:
   port: 8071
