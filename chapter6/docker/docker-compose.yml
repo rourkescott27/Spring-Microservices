@@ -33,6 +33,25 @@ services:
       backend:
         aliases:
           - "configserver"
+  eurekaserver:
+    image: ostock/eurekaserver:0.0.1-SNAPSHOT
+    build:
+      context: ../eurekaserver
+      args:
+        JAR_FILE: target/*.jar
+    environment:
+      JAVA_TOOL_OPTIONS: "-Dspring.cloud.config.token=${VAULT_TOKEN}"
+      CONFIGSERVER_URI: "http://configserver:8071"
+    ports:
+      - "8070:8070"
+    depends_on:
+#      Removed database: condition: service_healthy
+      configserver:
+        condition: service_started
+    networks:
+      backend:
+        aliases:
+          - "eurekaserver"
   licensingservice:
     image: ostock/licensing-service:0.0.2-SNAPSHOT
     build:
@@ -47,6 +66,7 @@ services:
       ENCRYPT_KEY: "IMSYMMETRIC"
       JAVA_TOOL_OPTIONS: "-Dspring.cloud.config.token=${VAULT_TOKEN}"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://database:5432/ostock_dev"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka/"
     depends_on:
       database:
         condition: service_healthy
@@ -54,6 +74,32 @@ services:
         condition: service_started
     ports:
       - "8080:8080"
+    networks:
+      - backend
+  organizationservice:
+    image: ostock/organization-service:0.0.1-SNAPSHOT
+    build:
+      context: ../organization-service
+      args:
+        JAR_FILE: target/*.jar
+    environment:
+      PROFILE: "dev"
+      CONFIGSERVER_URI: "http://configserver:8071"
+      CONFIGSERVER_PORT:   "8071"
+      DATABASESERVER_PORT: "5432"
+      ENCRYPT_KEY: "IMSYMMETRIC"
+      JAVA_TOOL_OPTIONS: "-Dspring.cloud.config.token=${VAULT_TOKEN}"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://database:5432/ostock_dev"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka/"
+    depends_on:
+      database:
+        condition: service_healthy
+      configserver:
+        condition: service_started
+      eurekaserver:
+        condition: service_started
+    ports:
+      - "8081:8081"
     networks:
       - backend
 
