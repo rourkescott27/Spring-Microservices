@@ -6,3 +6,6 @@ spring:
   cloud:
     config:
       uri: ${CONFIGSERVER_URI:http://localhost:8071}
+    loadbalancer:
+      ribbon:
+        enabled: false
