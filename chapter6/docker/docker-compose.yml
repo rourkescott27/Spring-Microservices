@@ -33,6 +33,12 @@ services:
       backend:
         aliases:
           - "configserver"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8071/actuator" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
   eurekaserver:
     image: ostock/eurekaserver:0.0.1-SNAPSHOT
     build:
@@ -47,7 +53,7 @@ services:
     depends_on:
 #      Removed database: condition: service_healthy
       configserver:
-        condition: service_started
+        condition: service_healthy
     networks:
       backend:
         aliases:
